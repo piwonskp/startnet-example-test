@@ -5,6 +5,8 @@ network = import_module(
 
 CMD = """curl {} -s -X POST -H "Content-Type: application/json" --data '{{"method":"starknet_chainId","params":[],"id":1,"jsonrpc":"2.0"}}' | jq"""
 
+RPC_URL = "{}://{}:{}/rpc/v0_6"
+
 
 def run(plan, args={}):
     output = network.run(plan, {"participants": [{"type": "papyrus"}, {"type": "juno"}]})
@@ -16,7 +18,7 @@ def run(plan, args={}):
             cmd=["sleep", "infinity"]
         ),
     )
-    papyrus_address = "{}://{}:{}/rpc/v0_6_0".format(output[0].ports["rpc"].application_protocol, output[0].ip_address, output[0].ports["rpc"].number)
+    papyrus_address = RPC_URL.format(output[0].ports["rpc"].application_protocol, output[0].ip_address, output[0].ports["rpc"].number)
     papyrus_out = plan.exec(
         service_name="tester",
         recipe=ExecRecipe(
@@ -28,7 +30,7 @@ def run(plan, args={}):
         ),
     )
 
-    juno_address = "{}://{}:{}/".format(output[1].ports["rpc"].application_protocol, output[1].ip_address, output[1].ports["rpc"].number)
+    juno_address = RPC_URL.format(output[1].ports["rpc"].application_protocol, output[1].ip_address, output[1].ports["rpc"].number)
     juno_out = plan.exec(
         service_name="tester",
         recipe=ExecRecipe(
